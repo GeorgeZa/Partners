@@ -1,0 +1,306 @@
+﻿@model PartnersModel
+@using System.Globalization;
+@using Nop.Plugin.Uga.Partners.Models;
+
+@{
+    Layout = "~/Views/Shared/_ColumnsOne.cshtml";
+}
+
+
+
+
+
+
+<script type="text/javascript">
+    var gmarkers = [];
+    var map;
+
+
+
+
+    $(document).ready(function () {
+
+        $('#showGrid').click(function (e) {
+
+            $("#customers-grid").data("kendoGrid").dataSource.read();
+            $("#customers-grid").css("display", "block");
+
+            var mapProp = {
+                center: new google.maps.LatLng(40.67418, 22.80549), //Greece Lat Long
+                zoom: 6,
+                mapTypeId: google.maps.MapTypeId.ROADMAP
+            };
+            for (i = 0; i < gmarkers.length; i++) {
+                gmarkers[i].setMap(null);
+            }
+
+            var purl = '@Url.Action("PartnersList", "Partners", new { id = "__param__" })';
+            purl = purl.replace('__param__', $("#searchTerm").val());
+
+            $.ajax({
+                type: "GET",
+                url: purl, //"../Map/Search"
+                contentType: "application/json; charset=utf-8",
+                data: additionalInfo,
+                dataType: "json",
+                success: function (data) {
+                    var table = "<table class='table'>";
+                    $.each(data, function (index, value) {
+                        table += "<tr><td>" + value.Name + "</td></tr>";
+                        var latlng = new google.maps.LatLng(value.Latitude, value.Longtitude);
+                        var marker = new google.maps.Marker({
+                            position: latlng,
+                            map: map,
+                           
+                            title: value.Description + '\n' + value.Name + '\n ' + value.Address + ' Postal Code: ' + value.PostCode + '\n' + value.Telephone + '\n' + value.Email
+                        });
+
+                        gmarkers.push(marker);
+
+                    });
+                    table += "</table>";
+                    $("#myData").html(table);
+
+
+                }
+            });
+            map = new google.maps.Map(document.getElementById("googleMap"), mapProp);
+
+        });
+
+        onPageLoad();
+    });
+
+    function onPageLoad() {
+
+
+        function initialize() {
+
+            $("#customers-grid").data("kendoGrid").dataSource.read();
+            $("#customers-grid").css("display", "block");
+
+            var mapProp = {
+                center: new google.maps.LatLng(40.67418, 22.80549), //Greece Lat Long
+                zoom: 6,
+                mapTypeId: google.maps.MapTypeId.ROADMAP
+            };
+
+            for (i = 0; i < gmarkers.length; i++) {
+                gmarkers[i].setMap(null);
+            }
+
+
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("PartnersList", "Partners")', //"../Map/Search"
+                contentType: "application/json; charset=utf-8",
+
+                dataType: "json",
+                success: function (data) {
+                    var table = "<table class='table'>";
+                    $.each(data, function (index, value) {
+                        table += "<tr><td>" + value.Name + "</td></tr>";
+                        var latlng = new google.maps.LatLng(value.Latitude, value.Longtitude);
+                        var marker = new google.maps.Marker({
+                            position: latlng,
+                            map: map,
+                            title: value.Description + '\n' + value.Name + '\n ' + value.Address + ' PostalCode: ' + value.PostCode + '\n' + value.Telephone + '\n' + value.Email
+                        });
+
+                        gmarkers.push(marker);
+
+                    });
+                    table += "</table>";
+                    $("#myData").html(table);
+
+
+                }
+            });
+            map = new google.maps.Map(document.getElementById("googleMap"), mapProp);
+        }
+
+        google.maps.event.addDomListener(window, 'load', initialize);
+
+    }
+
+</script>
+
+
+
+<script>
+
+   
+
+    function additionalInfo() {
+        var info = $("#searchTerm").val();
+        if (info) {
+            return {
+                id: info
+            };
+        }
+    }
+</script>
+
+<style>
+    
+    #googleMap {
+        height: 550px;
+        width: 100%;
+    }
+</style>
+
+
+<div class="page home-page">
+    <div class="page-body">
+        <span id="lbSearch">@T("Uga.Partners.Search").Text</span> 
+        <input type="text" id="searchTerm" name="text" value="" /><br />
+        <input id='showGrid' type="button" value="@T("Search.Searchbox.Tooltip")" />
+
+        <h2>@T("Uga.Partners.Shops")</h2>
+        <br />
+        <div class="row">
+           
+            <div class="col-md-6">
+                <table class="adminContent">
+                    <tr>
+                        <td>
+                            <div id="customers-grid"></div>
+
+                            <script>
+                    $(document).ready(function () {
+                        $("#customers-grid").kendoGrid({
+                            autoBind: false,
+                            dataSource: {
+                                //group: { field: "City" },
+                                type: "json",
+                                transport: {
+                                    read: {
+                                        url: "@Html.Raw(Url.Action("PartnersGridList", "Partners"))",
+                                        type: "POST",
+                                        dataType: "json",
+                                        data: additionalInfo
+                                    }
+                                },
+                                schema: {
+                                    data: "Data",
+                                    total: "Total",
+                                    errors: "Errors"
+                                },
+                                error: function(e) {
+                                    display_kendoui_grid_error(e);
+                                    this.cancelChanges();
+                                },
+                                pageSize: 20,
+                                serverPaging: true,
+                                serverFiltering: true,
+                                serverSorting: true
+                            },
+                            height: 550,
+                            sortable: {
+                                mode: "single",
+                                allowUnsort: false
+                            },
+                            pageable: false,
+                            scrollable: true,
+                            selectable:true,
+                            columns: [
+
+                                {
+                                    field: "Title",
+                                    title: "@T("Admin.Customers.Customers.Fields.FullName")",
+                                    width: 150
+                                },
+
+
+                               {
+                                   field: "Telephone",
+                                    title: "@T("Admin.Customers.Customers.Fields.Phone")",
+                                    width: 90
+                                },
+
+
+                               {
+                                   field: "City",
+                                   title: "@T("Admin.Customers.Customers.Fields.City")",
+                                width: 80
+                               },
+
+                                {
+                                    field: "Address",
+                                    title: "@T("Admin.Customers.Customers.Fields.StreetAddress")",
+                                width: 100
+                                },
+                           {
+                               field: "PostCode",
+                                title: "@T("Admin.Customers.Customers.Fields.ZipPostalCode")",
+                                width: 50
+                           },
+                           {
+                               field: "Email",
+                               title: "@T("Admin.Customers.Customers.Fields.Email")",
+                                width: 100
+                    },
+                          ]
+                        });
+                    });
+                            </script>
+
+                            <script type="text/javascript">
+
+                    var selectedIds = [];
+
+                    $(document).ready(function () {
+
+                        //search button
+                        $('#search-customers').click(function () {
+                            var grid = $('#customers-grid').data('kendoGrid');
+                            grid.dataSource.page(1); //new search. Set page size to 1
+                            //grid.dataSource.read(); we already loaded the grid above using "page" function
+                            //clear selected checkboxes
+                            $('.checkboxGroups').attr('checked', false).change();
+                            selectedIds = [];
+                            return false;
+                        });
+
+
+                        @*$("#@Html.FieldIdFor(model => model.SearchCompany)").keydown(function (event) {
+                            if (event.keyCode == 13) {
+                                $("#search-customers").click();
+                                return false;
+                            }
+                        });*@
+
+
+                    });
+
+
+
+
+
+            function additionalData() {
+
+
+
+                            @*var data = {
+                                SearchCompany: $('#@Html.FieldIdFor(model => model.SearchCompany)').val(),
+                                SearchZipPostalCode: $('#@Html.FieldIdFor(model => model.SearchZipPostalCode)').val()
+                            };
+                            addAntiForgeryToken(data);
+                            return data;*@
+                        }
+                            </script>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+           
+            <div class="col-md-6">
+
+                <div id="googleMap"></div>
+            </div>
+        </div>
+       
+     
+          
+        </div>
+</div>

@@ -1,0 +1,8 @@
+﻿Group: Uga
+FriendlyName: Partners
+SystemName: Uga.Partners
+Version: 1.01
+SupportedVersions: 3.60
+Author: George Zardavas
+DisplayOrder: 1
+FileName: Nop.Plugin.Uga.Partners.dll

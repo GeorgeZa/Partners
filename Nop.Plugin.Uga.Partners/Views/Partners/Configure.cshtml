@@ -1,0 +1,164 @@
+﻿@{
+    Layout = "";
+}
+@Html.AntiForgeryToken()
+<table class="adminContent">
+    <tr>
+        <td>
+            <div id="partners-grid"></div>
+
+            <script>
+                $(document).ready(function () {
+                    $("#partners-grid").kendoGrid({
+                        toolbar: ["create"],
+                        dataSource: {
+                            type: "json",
+                            transport: {
+                                read: {
+                                    url: "@Html.Raw(Url.Action("Configure", "Partners", new RouteValueDictionary { { "Namespaces", "Nop.Plugin.Uga.Partners.Controllers" }, { "area", "" } }))",
+                                    type: "POST",
+                                    dataType: "json",
+                                    data: addAntiForgeryToken
+                                },
+                                create: {
+                                     url:"@Html.Raw(Url.Action("PartnersCreate", "Partners", new RouteValueDictionary { { "Namespaces", "Nop.Plugin.Uga.Partners.Controllers" }, { "area", "" } }))",
+                                    type: "POST",
+                                    dataType: "json",
+                                    data: addAntiForgeryToken
+                                },
+                                update: {
+                                    url:"@Html.Raw(Url.Action("PartnersUpdate", "Partners", new RouteValueDictionary { { "Namespaces", "Nop.Plugin.Uga.Partners.Controllers" }, { "area", "" } }))",
+                                    type: "POST",
+                                    dataType: "json",
+                                    data: addAntiForgeryToken
+                                },
+                                    destroy: {
+                                        url: "@Html.Raw(Url.Action("PartnersDelete", "Partners", new RouteValueDictionary { { "Namespaces", "Nop.Plugin.Uga.Partners.Controllers" }, { "area", "" } }))",
+                                        type: "POST",
+                                        dataType: "json",
+                                        data: addAntiForgeryToken
+                                    }
+                            },
+                            schema: {
+                                data: "Data",
+                                total: "Total",
+                                errors: "Errors",
+                                model: {
+                                    id: "Id",
+                                    fields: {
+                                        Name: { editable: true, type: "string" },
+                                        Description: { editable: true, type: "string" },
+                                        City: { editable: true, type: "string" },
+                                        Telephone: { editable: true, type: "string" },
+                                        Address: { editable: true, type: "string" },
+                                        PostCode: { editable: true, type: "string" },
+                                        Latitude: { editable: true, type: "string" },
+                                        Longtitude: { editable: true, type: "string" },
+                                        Title: { editable: true, type: "string" },
+                                        Email: { editable: true, type: "string" },
+
+                                    }
+                                }
+                            },
+                            requestEnd: function (e) {
+                                if (e.type == "update") {
+                                    this.read();
+                                }
+                            },
+                            error: function (e) {
+                                display_kendoui_grid_error(e);
+                                // Cancel the changes
+                                this.cancelChanges();
+                            },
+                            serverPaging: true,
+                            serverFiltering: true,
+                            serverSorting: true
+                        },
+                        pageable: {
+                            refresh: true,
+                            numeric: false,
+                            previousNext: false,
+                            info: false
+                        },
+                        editable: {
+                            confirmation: false,
+                            mode: "inline"
+                        },
+                        scrollable: false,
+                        columns: [{
+                            field: "Name",
+                            title: "Name",
+                            width: 200
+                        }, {
+                                field: "Description",
+                            title: "Description",
+                            width: 200,
+
+                            },
+                             {
+                                 field: "City",
+                                 title: "City",
+                                width: 100,
+
+                        },
+                             {
+                                 field: "Telephone",
+                                 title: "Telephone",
+                                 width: 100,
+
+                             },
+                             {
+                                 field: "Address",
+                                 title: "Address",
+                                 width: 200,
+
+                             },
+                             {
+                                 field: "PostCode",
+                                 title: "PostCode",
+                                 width: 70,
+
+                             },
+                             {
+                                 field: "Latitude",
+                                 title: "Latitude",
+                                 width: 100,
+
+                             },
+                             {
+                                 field: "Longtitude",
+                                 title: "Longtitude",
+                                 width: 100,
+
+                             },
+                             {
+                                 field: "Title",
+                                 title: "Title",
+                                 width: 100,
+
+                             },
+                             {
+                                 field: "Email",
+                                 title: "Email",
+                                 width: 100,
+
+                             },
+                        {
+                            command: { name: "edit", text: "@T("Admin.Common.Edit")" },
+
+                            title: "@T("Admin.Common.Edit")",
+                            width: 150
+                             },
+                        {
+                            command: { name: "delete", text: "@T("Admin.Common.Delete")" },
+
+                            title: "@T("Admin.Common.Delete")",
+                            width: 150
+                        }
+                        ]
+                    });
+                });
+            </script>
+        </td>
+    </tr>
+</table>
