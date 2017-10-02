@@ -7,7 +7,7 @@ nopCommerce site: [http://www.nopcommerce.com](http://www.nopcommerce.com)
 
 Listing on nopCommerce "extensions and themes" catalog: [https://www.nopcommerce.com/p/2886/network-of-partners.aspx](https://www.nopcommerce.com/p/2886/network-of-partners.aspx)
 
-Discussion Post on Forum : [https://www.nopcommerce.com/p/2886/network-of-partners.aspx](https://www.nopcommerce.com/p/2886/network-of-partners.aspx)
+Discussion Post on Forum : [https://www.nopcommerce.com/boards/t/48934/network-of-partners-plugin.aspx](https://www.nopcommerce.com/boards/t/48934/network-of-partners-plugin.aspx)
 
 nopCommerce
 ===========
