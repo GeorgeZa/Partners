@@ -3,14 +3,9 @@ using Nop.Web.Framework.Mvc;
 
 namespace Nop.Plugin.Uga.Partners.Models
 {
-    
-    public partial class PartnersModel : BaseNopEntityModel
+    [System.Diagnostics.DebuggerDisplay("{DebuggerDisplay,nq}")]
+    public class PartnersModel : BaseNopEntityModel
     {
-        public PartnersModel()
-        {
-           
-        }
-
         public string Name { get; set; }
         public string Description { get; set; }
         public string City { get; set; }
@@ -21,5 +16,11 @@ namespace Nop.Plugin.Uga.Partners.Models
 		public string Longtitude { get; set; }
 		public string Title { get; set; }
 		public string Email { get; set; }
-	}
+
+        [System.Diagnostics.DebuggerBrowsable(System.Diagnostics.DebuggerBrowsableState.Never)]
+        private string DebuggerDisplay
+        {
+            get { return ToString(); }
+        }
+    }
 }

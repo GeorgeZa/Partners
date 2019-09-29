@@ -51,8 +51,8 @@
                         var marker = new google.maps.Marker({
                             position: latlng,
                             map: map,
-                           
-                            title: value.Description + '\n' + value.Name + '\n ' + value.Address + ' Postal Code: ' + value.PostCode + '\n' + value.Telephone + '\n' + value.Email
+                          
+                            title: value.Description + '\n' + value.Name + '\n ' + value.Address + ' PostalCode: ' + value.PostCode + '\n' + value.Telephone + '\n' + value.Email
                         });
 
                         gmarkers.push(marker);
@@ -104,6 +104,7 @@
                         var marker = new google.maps.Marker({
                             position: latlng,
                             map: map,
+                           
                             title: value.Description + '\n' + value.Name + '\n ' + value.Address + ' PostalCode: ' + value.PostCode + '\n' + value.Telephone + '\n' + value.Email
                         });
 
@@ -300,7 +301,19 @@
             </div>
         </div>
        
-     
+        @*<br />
+        <div class="row">
+            <div class="col-lg-12" id="partnersLogosWrapper">
+                <h2>@T("Uga.Partners.Chains")</h2>
+                <div class="partnersLogos">
+                    <img src="~/Content/Images/praktiker.jpg" class="img-responsive" />
+                    <img src="~/Content/Images/masoutis.jpg" class="img-responsive" />
+                    <img src="~/Content/Images/xalkiadakis.jpg" class="img-responsive" />
+                    <img src="~/Content/Images/proodos.jpg" class="img-responsive" />
+                    <img src="~/Content/Images/ellhnika.jpg" class="img-responsive" />
+                </div>
+            </div>
+        </div>*@
           
         </div>
 </div>

@@ -10,7 +10,8 @@ using System.Threading.Tasks;
 
 namespace Nop.Plugin.Uga.Partners.Services
 {
-    public partial class PartnerService : IPartnerService
+    [System.Diagnostics.DebuggerDisplay("{DebuggerDisplay,nq}")]
+    public class PartnerService : IPartnerService
     {
         #region Constants
         private const string PARTNER_ALL_KEY = "Nop.partners.all-{0}-{1}";
@@ -29,23 +30,23 @@ namespace Nop.Plugin.Uga.Partners.Services
             this._pRepository = pRepository;
         }
 
+        [System.Diagnostics.DebuggerBrowsable(System.Diagnostics.DebuggerBrowsableState.Never)]
+        private string DebuggerDisplay => ToString();
+
         #endregion
 
         #region Methods
 
         public virtual void DeletePartners()
         {
-          
             var partners = this.GetAll();
 
-            foreach(PartnersRecord r in partners)
-                _pRepository.Delete(r);
-
+            RepoDelete(partners);
         }
 
         public virtual IPagedList<PartnersRecord> GetAll(int pageIndex = 0, int pageSize = int.MaxValue)
         {
-            string key = string.Format(PARTNER_ALL_KEY, pageIndex, pageSize);
+            var key = string.Format(PARTNER_ALL_KEY, pageIndex, pageSize);
             return _cacheManager.Get(key, () =>
             {
                 var query = from sbw in _pRepository.Table
@@ -57,20 +58,23 @@ namespace Nop.Plugin.Uga.Partners.Services
             });
         }
 
-
-		public virtual void DeletePartner(PartnersRecord record) {
-
-			var partners = this.GetAll().Where(p=>p.Id==record.Id);
-
-			foreach (PartnersRecord r in partners)
-				_pRepository.Delete(r);
-
-		}
-
-		public virtual void InsertPartnerRecord(PartnersRecord record)
+        public virtual void DeletePartner(PartnersRecord record)
         {
-            if (record == null)
-                throw new ArgumentNullException("PartnersRecord");
+            IEnumerable<PartnersRecord> partners = GetAll().Where(p => p.Id == record.Id);
+
+            RepoDelete(partners);
+        }
+
+        private void RepoDelete(IEnumerable<PartnersRecord> partners)
+        {
+            foreach (var r in partners)
+            {
+                _pRepository.Delete(r);
+            }
+        }
+
+        public virtual void InsertPartnerRecord(PartnersRecord record)
+        {
 
             _pRepository.Insert(record);
 
@@ -79,13 +83,13 @@ namespace Nop.Plugin.Uga.Partners.Services
 
         public virtual void UpdatePartnerRecord(PartnersRecord record)
         {
-            if (record == null)
-                throw new ArgumentNullException("PartnersRecord");
+           
 
             _pRepository.Update(record);
-			
             _cacheManager.RemoveByPattern(PARTNER_PATTERN_KEY);
         }
+
+       
 
         #endregion
     }

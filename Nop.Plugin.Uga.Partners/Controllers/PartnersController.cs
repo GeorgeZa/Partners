@@ -55,7 +55,6 @@ namespace Nop.Plugin.Uga.Partners.Controllers
             this._pService = pService;
             this._workContext = workContext;
             this._pRepository = pRepository;
-            
         }
 
 		#endregion
@@ -65,7 +64,6 @@ namespace Nop.Plugin.Uga.Partners.Controllers
 		#endregion
 
 		#region Methods
-
 
 		[ChildActionOnly]
 		public ActionResult Configure() {
@@ -77,7 +75,8 @@ namespace Nop.Plugin.Uga.Partners.Controllers
 		
 			var partnerModels = new List<PartnersModel>();
 			foreach (var partner in _pService.GetAll())
-				partnerModels.Add(new PartnersModel {
+				partnerModels.Add(new PartnersModel()
+                {
 					 Address =partner.Address,
 					 City=partner.City,
 					 Description=partner.Description,
@@ -91,7 +90,8 @@ namespace Nop.Plugin.Uga.Partners.Controllers
 					 Id=partner.Id
 				});
 
-			var gridModel = new DataSourceResult {
+            DataSourceResult gridModel = new DataSourceResult()
+            {
 				Data = partnerModels,
 				Total = partnerModels.Count
 			};
@@ -116,15 +116,18 @@ namespace Nop.Plugin.Uga.Partners.Controllers
 			rec.Description = model.Description;
 			rec.Email = model.Email;
 
-			if (rec.Id == 0)
-				_pService.InsertPartnerRecord(rec);
-			else
-				_pService.UpdatePartnerRecord(rec);
-			
+            if (rec.Id == 0)
+            {
+                _pService.InsertPartnerRecord(rec);
+            }
+            else
+            {
+                _pService.UpdatePartnerRecord(rec);
+            }
 
-			//_pService.SetSetting(string.Format("ShippingRateComputationMethod.FixedRate.Rate.ShippingMethodId{0}", shippingMethodId), rate);
+            //_pService.SetSetting(string.Format("ShippingRateComputationMethod.FixedRate.Rate.ShippingMethodId{0}", shippingMethodId), rate);
 
-			return new NullJsonResult();
+            return new NullJsonResult();
 		}
 
 
@@ -151,7 +154,6 @@ namespace Nop.Plugin.Uga.Partners.Controllers
 			else
 				_pService.UpdatePartnerRecord(rec);
 
-
 			//_pService.SetSetting(string.Format("ShippingRateComputationMethod.FixedRate.Rate.ShippingMethodId{0}", shippingMethodId), rate);
 
 			return new NullJsonResult();
@@ -175,7 +177,7 @@ namespace Nop.Plugin.Uga.Partners.Controllers
 
 
 
-		public ActionResult Index()
+        public ActionResult Index()
         {
             return View("~/Plugins/Uga.Partners/Views/Partners/Index.cshtml");
         }
@@ -184,22 +186,13 @@ namespace Nop.Plugin.Uga.Partners.Controllers
         [HttpPost]
         public ActionResult PartnersGridList(DataSourceRequest request, string id) {
             IList<PartnersModel> partners;
-            if (!string.IsNullOrEmpty(id)) {
-                 partners = (from c in _pRepository.Table.AsEnumerable()
-                                                 where (c.City.ToUpper().Contains(id.ToUpper()) || c.PostCode.ToUpper().Contains(id.ToUpper()))
-                                                 select new PartnersModel {
-                                                     Id = c.Id, Name = c.Name, Title = c.Description, Email = c.Email,
-                                                     Telephone = c.Telephone, PostCode = c.PostCode,
-                                                     Address = c.Address, City = c.City
-                                                 }).Distinct().ToList();
+            if (!string.IsNullOrEmpty(id))
+            {
+                partners = (whereReduce(id)).Distinct().ToList();
             }
             else {
                  partners = (from c in _pRepository.Table.AsEnumerable()
-                                                 select new PartnersModel {
-                                                     Id = c.Id, Name = c.Name, Title = c.Description, Email = c.Email,
-                                                     Telephone = c.Telephone, PostCode = c.PostCode,
-                                                     Address = c.Address, City = c.City
-                                                 }).Distinct().ToList();
+                             select getPartnerDetails(c)).Distinct().ToList();
             }
 
             var gridModel = new DataSourceResult {
@@ -210,31 +203,46 @@ namespace Nop.Plugin.Uga.Partners.Controllers
             return Json(gridModel, JsonRequestBehavior.AllowGet);
         }
 
-        
+        private IEnumerable<PartnersModel> whereReduce(string id)
+        {
+            return from c in _pRepository.Table.AsEnumerable()
+                   where (c.City.ToUpper().Contains(id.ToUpper()) || c.PostCode.ToUpper().Contains(id.ToUpper()))
+                   select getPartnerDetails(c);
+        }
+
         public ActionResult PartnersList(string id)
         {
             IList<PartnersModel> partners;
-            if (!string.IsNullOrEmpty(id)) {
-                partners = (from c in _pRepository.Table.AsEnumerable()
-                            where (c.City.ToUpper().Contains(id.ToUpper()) || c.PostCode.ToUpper().Contains(id.ToUpper()))
-                            select new PartnersModel {
-                                Id = c.Id, Name = c.Name, Title = c.Description, Email = c.Email, Description = c.Description,
-                                Telephone = c.Telephone, PostCode = c.PostCode,
-                                Address = c.Address, City = c.City, Latitude = c.Latitude, Longtitude = c.Longtitude
-                            }).Distinct().ToList();
+            if (!string.IsNullOrEmpty(id))
+            {
+                partners = (whereReduce(id)).Distinct().ToList();
 
             }
             else {
                 partners = (from c in _pRepository.Table.AsEnumerable()
-                            select new PartnersModel {
-                                Id = c.Id, Name = c.Name, Title = c.Description, Email = c.Email, Description = c.Description,
-                                Telephone = c.Telephone, PostCode = c.PostCode,
-                                Address = c.Address, City = c.City, Latitude = c.Latitude, Longtitude = c.Longtitude
-                            }).Distinct().ToList();
+                            select getPartnerDetails(c)).Distinct().ToList();
             }
            
 
             return Json(partners, JsonRequestBehavior.AllowGet);
+        }
+
+        private static PartnersModel getPartnerDetails(PartnersRecord c)
+        {
+            return new PartnersModel
+            {
+                Id = c.Id,
+                Name = c.Name,
+                Title = c.Description,
+                Email = c.Email,
+                Description = c.Description,
+                Telephone = c.Telephone,
+                PostCode = c.PostCode,
+                Address = c.Address,
+                City = c.City,
+                Latitude = c.Latitude,
+                Longtitude = c.Longtitude
+            };
         }
 
         #endregion
